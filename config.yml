@@ -1,0 +1,9 @@
+vocab_size : 65          # character-level Shakespeare
+context_length : 256
+d_model : 256
+n_heads : 8
+n_layers : 6
+d_ff : 1024
+dropout : 0.1
+batch_size : 32
+lr : 3e-4
