@@ -3,7 +3,8 @@ from torch.utils.data import Dataset, DataLoader
 import datasets
 from datasets import load_dataset
 
-
+from torch.utils.data import Dataset, DataLoader
+from yaml import safe_load
 
 class Tokenizer:
     def __init__(self, cfg : dict):
@@ -30,24 +31,22 @@ class GPTDataset(Dataset):
             dataset_clean = [char for char in dataset if char in self.vocab]
 
         self.tokenizer = tokenizer
-
         self.dataset_tokenized = self.tokenizer.encode(dataset_clean)
 
     def __getitem__(self, idx):
         n_ctx = self.cfg['n_ctx']
 
         tokens = self.dataset_tokenized[idx:idx+n_ctx]
-        return tokens
+        return (tokens, tokens[1:].long())
 
     def __len__(self):
-        return len(self.dataset_tokenized)
+        return len(self.dataset_tokenized) - self.cfg['n_ctx']
 
 if __name__ == "__main__":
     with open('config.yml', 'r') as file:
         cfg = safe_load(file)
 
     tokenizer = Tokenizer(cfg)
-    print(tokenizer.encode('hello world'))
 
     dataset = GPTDataset(cfg, 'datasets/tinyshakespeare_flat', tokenizer)
-    print(dataset[0].shape)
+    print(dataset[0][0].shape, dataset[0][1].shape)

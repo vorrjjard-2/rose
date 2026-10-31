@@ -56,7 +56,8 @@ class PositionalEmbedding(nn.Module):
         self.register_buffer("W_PE", W_PE)
 
     def forward(self, x):
-        return self.W_PE[x]
+        seq_len = x.shape[-1]
+        return self.W_PE[0:seq_len]
 
 
 # ATTENTION
@@ -70,8 +71,6 @@ class Attention(nn.Module):
         d_model, n_heads = cfg['d_model'], cfg['n_heads']
         d_head = d_model // n_heads
 
-        self.device = cfg['device']
-
         self.W_Q = nn.Parameter(t.empty(size=(n_heads, d_model, d_head)))
         self.W_K = nn.Parameter(t.empty(size=(n_heads, d_model, d_head)))
         self.W_V = nn.Parameter(t.empty(size=(n_heads, d_model, d_head)))
@@ -81,7 +80,7 @@ class Attention(nn.Module):
 
         self.W_O = nn.Parameter(t.empty(size=(n_heads, d_head, d_model))) # project back up?
         self.b_O = nn.Parameter(t.zeros(d_model)) #only d_model since this is added AFTER summing heads
-        self.register_buffer('ignore', t.tensor(-1e5, dtype=t.float32)) # NEED : specify device?
+        self.register_buffer('ignore', t.tensor(-1e5, dtype=t.float32)) # NEED : specify device? yes.
 
         nn.init.normal_(self.W_Q, std=self.init_range)
         nn.init.normal_(self.W_K, std=self.init_range)
@@ -99,12 +98,12 @@ class Attention(nn.Module):
         _, _, posn_Q, posn_K = x.shape
 
 
-        mask = t.triu(t.ones((posn_Q, posn_K), device=self.device), diagonal=1).bool() # boolean mask
+        mask = t.triu(t.ones((posn_Q, posn_K)), diagonal=1).bool().to(x.device)
         return x.masked_fill(mask, self.ignore)
 
     def scale(self, x):
 
-        d_model, n_heads = cfg['d_model'], cfg['n_heads']
+        d_model, n_heads = self.cfg['d_model'], self.cfg['n_heads']
         d_head = d_model // n_heads
 
         return x / (d_head ** 0.5)
@@ -112,7 +111,6 @@ class Attention(nn.Module):
     def forward(self, x):
         """
          x.shape : [b, seq_len, d_model]
-
         """
 
         q = einsum(x, self.W_Q, 'b posn d_model, n_heads d_model d_head -> b posn n_heads d_head') + self.b_Q
@@ -203,5 +201,4 @@ if __name__ == "__main__":
         model = Transformer(cfg)
 
         out = model(tokens)
-
         print(out.shape)
