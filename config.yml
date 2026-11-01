@@ -1,5 +1,5 @@
 vocab_size : 34        # character-level Shakespeare
-n_ctx : 8
+n_ctx : 64
 d_model : 256
 n_heads : 8
 n_layers : 6
@@ -10,5 +10,9 @@ init_range : 0.2
 device : 'mps'
 
 ## training args
-batch_size : 8
-epochs : 1
+batch_size : 32
+epochs : 50
+
+## checkpointing
+checkpoint_dir : 'checkpoints/'
+save_model_every : 25
