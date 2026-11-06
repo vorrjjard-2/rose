@@ -136,17 +136,18 @@ class Trainer:
 
         tokenizer = Tokenizer(cfg)
 
+if __name__ == "__main__":
 
-with open("config.yml", "r") as file:
+    with open("config.yml", "r") as file:
     cfg = safe_load(file)
 
 
-tokenizer = Tokenizer(cfg)
-dataset = GPTDataset(cfg, "datasets/tinyshakespeare_flat", tokenizer)
+    tokenizer = Tokenizer(cfg)
+    dataset = GPTDataset(cfg, "datasets/tinyshakespeare_flat", tokenizer)
 
-model = Transformer(cfg).to(cfg["device"])
-trainer = Trainer(cfg, model, dataset, "/checkpoints")
+    model = Transformer(cfg).to(cfg["device"])
+    trainer = Trainer(cfg, model, dataset, "/checkpoints")
 
 ### Here we go
 
-trainer.train_model()
+    trainer.train_model()
