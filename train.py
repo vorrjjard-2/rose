@@ -136,11 +136,10 @@ class Trainer:
 
         tokenizer = Tokenizer(cfg)
 
+
 if __name__ == "__main__":
-
     with open("config.yml", "r") as file:
-    cfg = safe_load(file)
-
+        cfg = safe_load(file)
 
     tokenizer = Tokenizer(cfg)
     dataset = GPTDataset(cfg, "datasets/tinyshakespeare_flat", tokenizer)
@@ -148,6 +147,6 @@ if __name__ == "__main__":
     model = Transformer(cfg).to(cfg["device"])
     trainer = Trainer(cfg, model, dataset, "/checkpoints")
 
-### Here we go
+    ### Here we go
 
     trainer.train_model()
