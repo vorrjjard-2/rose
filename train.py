@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 from einops import einsum, rearrange, reduce
 from torch.utils.data import DataLoader, Dataset, random_split
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from yaml import safe_load
 
 from data import GPTDataset, Tokenizer
