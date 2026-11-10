@@ -106,7 +106,7 @@ class Trainer:
                     {"val_loss_avg": f"{val_loss:.4f}", "val_acc_avg": f"{val_acc:.4f}"}
                 )
 
-            return (val_loss, val_acc)
+        return (val_loss, val_acc)
 
     def save_model(self, filename="model"):
         dir = self.cfg["checkpoint_dir"]

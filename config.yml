@@ -1,13 +1,13 @@
-vocab_size : 64    # character-level Shakespeare
+vocab_size : 65 # character-level Shakespeare
 n_ctx : 256
 d_model : 384
 n_heads : 6
 n_layers : 6
 dropout : 0.2
 lr : 1e-3
-possible_tokens : "!$&',-.3:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+possible_tokens : "!$&',-.3:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
 init_range : 0.02
-device : 'cuda'
+device : 'mps'
 ## training args
 batch_size : 64
 epochs : 80
