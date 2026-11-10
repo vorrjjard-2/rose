@@ -7,7 +7,7 @@ dropout : 0.2
 lr : 1e-3
 possible_tokens : "!$&',-.3:;?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
 init_range : 0.02
-device : 'mps'
+device : 'cuda'
 ## training args
 batch_size : 64
 epochs : 80
