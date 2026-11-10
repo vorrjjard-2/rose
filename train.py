@@ -2,6 +2,8 @@
 Training script for my first iteration of an LLM.
 """
 
+import argparse
+
 import numpy as np
 import torch as t
 import torch.nn as nn
@@ -16,7 +18,7 @@ from transformer import Transformer
 
 
 class Trainer:
-    def __init__(self, cfg, model, dataset, checkpoint_path):
+    def __init__(self, cfg, model, dataset, checkpoint_path, verbose=False):
         self.dataset = dataset
         self.model = model
         self.cfg = cfg
@@ -37,10 +39,11 @@ class Trainer:
 
         self.loss_fn = nn.CrossEntropyLoss()
         self.optimizer = optim.Adam(self.model.parameters(), lr=float(self.cfg["lr"]))
+        self.verbose = verbose
 
     def training_step(self):
         model.train()
-        train_bar = tqdm(self.train_dl, position=1)
+        train_bar = tqdm(self.train_dl, position=1) if self.verbose else self.train_dl
 
         train_losses = []
 
@@ -60,7 +63,9 @@ class Trainer:
             loss.backward()  # feed the loss back (backprop)
             self.optimizer.step()  # move all the parameters
             self.optimizer.zero_grad()  # reset the optimizer
-            train_bar.set_postfix({"loss": f"{loss:.4f}"})
+
+            if self.verbose:
+                train_bar.set_postfix({"loss": f"{loss:.4f}"})
 
             train_losses.append(loss.detach().item())
 
@@ -69,7 +74,7 @@ class Trainer:
     @t.no_grad()
     def validation_step(self):
         self.model.eval()
-        val_bar = tqdm(self.val_dl, position=1)
+        val_bar = tqdm(self.val_dl, position=1) if self.verbose else self.val_dl
 
         val_losses = []
         accs = []
@@ -96,10 +101,10 @@ class Trainer:
             accs.append(accuracy)
 
             val_loss, val_acc = np.mean(val_losses), np.mean(accs)
-
-            val_bar.set_postfix(
-                {"val_loss_avg": f"{val_loss:.4f}", "val_acc_avg": f"{val_acc:.4f}"}
-            )
+            if self.verbose:
+                val_bar.set_postfix(
+                    {"val_loss_avg": f"{val_loss:.4f}", "val_acc_avg": f"{val_acc:.4f}"}
+                )
 
             return (val_loss, val_acc)
 
@@ -145,7 +150,16 @@ if __name__ == "__main__":
     dataset = GPTDataset(cfg, "datasets/tinyshakespeare_flat", tokenizer)
 
     model = Transformer(cfg).to(cfg["device"])
-    trainer = Trainer(cfg, model, dataset, "/checkpoints")
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--not-verbose", action="store_true", help="suppress training logs"
+    )
+    args = parser.parse_args()
+
+    trainer = Trainer(
+        cfg, model, dataset, "/checkpoints", verbose=False if args.not_verbose else True
+    )
 
     ### Here we go
 
